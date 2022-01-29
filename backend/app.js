@@ -1,5 +1,6 @@
 // Moudle
 const express = require('express');
+const cors = require('cors');
 
 // Database Conntect
 require('./models/db');
@@ -10,6 +11,7 @@ const app = express();
 
 // Middleware
 app.use(express.json());
+app.use(cors());
 app.use(express.urlencoded({ extended: true }));
 
 // Router

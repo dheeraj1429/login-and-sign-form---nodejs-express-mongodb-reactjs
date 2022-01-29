@@ -1,0 +1,12 @@
+.email-login label {
+  color: rgb(170 166 166);
+}
+input,
+input {
+  padding: 15px 20px;
+  margin-top: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+}

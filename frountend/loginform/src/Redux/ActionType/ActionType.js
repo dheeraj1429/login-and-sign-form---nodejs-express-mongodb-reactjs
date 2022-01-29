@@ -1,0 +1,4 @@
+export const ACTION_TYPE = {
+  LOGIN_USERS: 'LOGIN_USERS',
+  SIGNIN_USERS: 'SIGNIN_USERS',
+};

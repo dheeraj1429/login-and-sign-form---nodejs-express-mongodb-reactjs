@@ -15,6 +15,10 @@ const User = new mongoose.Schema({
     type: String,
     required: [true, 'please enter the password'],
   },
+  created: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 const userModel = new mongoose.model('user', User);
