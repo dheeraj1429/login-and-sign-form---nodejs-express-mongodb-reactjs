@@ -32,6 +32,8 @@ export const loginUser = function (data) {
     try {
       const userDataFindRef = await axios.post('/user/find', { data }, { headers });
 
+      console.log(userDataFindRef);
+
       if (userDataFindRef) {
         dispatch({
           type: ACTION_TYPE.LOGIN_USERS,

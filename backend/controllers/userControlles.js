@@ -2,26 +2,29 @@ const userModel = require('../models/userSchema');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const JWT_TOKEN = 'abcdefghijklmnopqrstuvwxyzo#(*&!(*&$(H!)*UNIfjboisub#%@!%%!ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-
 // Sign In -> store user into database
 const userSignIn = async (req, res) => {
   const { name, email, password } = req.body.data;
-
-  // hashing password
-  const hashPassword = await bcrypt.hash(password, 10);
 
   try {
     // Create a new user
     const UserStore = new userModel({
       name,
       email,
-      password: hashPassword,
+      password,
     });
 
     // store user data into database
     const userRef = await UserStore.save(UserStore);
 
+    // Genrate the token
+    const token = await UserStore.genrateUserToken();
+    res.cookie('jwt', token, {
+      expires: new Date(Date.now() + 1000000),
+      httpOnly: true,
+    });
+
+    // Send back response
     if (userRef) {
       return res.status(201).json({
         success: true,
@@ -48,36 +51,32 @@ const userLogin = async function (req, res) {
     const { email, password } = req.body.data;
 
     // Find the user from the datbase
-    const userFindRef = await userModel.find({ email });
+    const userFindRef = await userModel.findOne({ email });
 
-    if (userFindRef.length == 0) {
-      return res.status(400).json({
-        success: false,
-        massage: 'no user fount',
-      });
-    }
+    // genrate the token for the login user
+    const token = await userFindRef.genrateUserToken();
+
+    res.cookie('jwt', token, {
+      expires: new Date(Date.now() + 1000000),
+      httpOnly: true,
+    });
+
+    // varify the token
+    const userPresent = req.cookies.jwt;
+    const varifyUser = await jwt.verify(userPresent, process.env.SECRET_KEY);
+    console.log(varifyUser);
 
     // Match hashpassword
-    const userHashPasswordMatch = await bcrypt.compare(password, userFindRef[0].password);
+    const userHashPasswordMatch = await bcrypt.compare(password, userFindRef.password);
 
-    if (userHashPasswordMatch === true) {
-      // Genrate a JWT token
-      const token = await jwt.sign(
-        {
-          id: userFindRef[0]._id,
-          name: userFindRef[0].name,
-        },
-        JWT_TOKEN
-      );
-
+    if (userHashPasswordMatch) {
       // send back the response with token
       return res.status(200).json({
         success: true,
         massage: 'successful login',
         data: {
-          name: userFindRef[0].name,
-          email: userFindRef[0].email,
-          token,
+          name: userFindRef.name,
+          email: userFindRef.email,
         },
       });
     }

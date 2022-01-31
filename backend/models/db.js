@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 mongoose
-  .connect('mongodb://localhost:27017/loginform')
+  .connect(process.env.DATABASE)
   .then(() => {
     console.log('database connected');
   })
